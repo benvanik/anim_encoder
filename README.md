@@ -1,4 +1,9 @@
 # Animation Encoder
+
+HEAVILY MODIFIED FROM THE ORIGINAL
+Documation of features/changes forthcoming.
+
+
 ## Overview
 anim_encoder creates small JavaScript+HTML animations from a series on PNG images.
 This is a modification of that original post, that adds some actual documentation
@@ -23,7 +28,7 @@ Note you can just delete frames you don't want as you initially set up, should s
 time. Then to run the program just go
 
 ```
-python capture.py
+python capture.py example
 ```
 
 If you need to change any settings it should be pretty simple just jump over to config.py
