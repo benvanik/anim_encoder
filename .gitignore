@@ -1,1 +1,4 @@
 *.pyc
+capture/
+capture.js
+capture.png
