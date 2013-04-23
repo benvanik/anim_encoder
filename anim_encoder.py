@@ -35,7 +35,7 @@ from numpy import *
 from time import time
 
 # How long to wait before the animation restarts
-END_FRAME_PAUSE = 4000
+END_FRAME_PAUSE = 0
 
 # How many pixels can be wasted in the name of combining neighbouring changed
 # regions.
@@ -129,12 +129,20 @@ def find_matching_rect(bitmap, num_used_rows, packed, src, sx, sy, w, h):
 
 def generate_animation(anim_name):
     frames = []
-    rex = re.compile("screen_([0-9]+).png")
+    frame_meta = []
+    rex = re.compile("screenshot_([0-9]+).png")
     for f in os.listdir(anim_name):
         m = re.search(rex, f)
         if m:
             frames.append((int(m.group(1)), anim_name + "/" + f))
+            meta_content_file = anim_name + "/" + f.replace('png', 'txt')
+            if os.path.exists(meta_content_file):
+                f = open(meta_content_file, 'r')
+                meta_content = f.read()
+                f.close()
+                frame_meta.append((int(m.group(1)), meta_content))
     frames.sort()
+    frame_meta.sort()
 
     images = [misc.imread(f) for t, f in frames]
 
@@ -197,11 +205,11 @@ def generate_animation(anim_name):
 
     misc.imsave(anim_name + "_packed_tmp.png", packed)
     # Don't completely fail if we don't have pngcrush
-    if os.system("pngcrush -q " + anim_name + "_packed_tmp.png " + anim_name + "_packed.png") == 0:
+    if os.system("pngcrush -q " + anim_name + "_packed_tmp.png " + anim_name + ".png") == 0:
         os.system("rm " + anim_name + "_packed_tmp.png")
     else:
         print "pngcrush not found, output will not be larger"
-        os.system("mv " + anim_name + "_packed_tmp.png " + anim_name + "_packed.png")
+        os.system("mv " + anim_name + "_packed_tmp.png " + anim_name + ".png")
 
     # Generate JSON to represent the data
     times = [t for t, f in frames]
@@ -220,13 +228,24 @@ def generate_animation(anim_name):
             w, h = b.stop - b.start, a.stop - a.start
             dy, dx = dst_rects[j]
 
-            blitlist.append([dx, dy, w, h, sx, sy])
+            blitlist.append([int(dx), int(dy), int(w), int(h), int(sx), int(sy)])
 
         timeline.append({'delay': delays[i], 'blit': blitlist})
 
-    f = open(anim_name + '_anim.js', 'wb')
-    f.write(anim_name + "_timeline = ")
-    json.dump(timeline, f)
+    data = {
+        'width': iw,
+        'height': ih,
+        'timeline': timeline,
+        'meta': [x[1] for x in frame_meta],
+        }
+    data_json = json.dumps(data)
+
+    f = open(anim_name + '.js', 'wb')
+    f.write(
+        '(function(global, name){' +
+        'global.animationData = global.animationData = {};' +
+        'global.animationData[name] = ' + data_json + ';' +
+        '})(window, "' + anim_name + '");')
     f.close()
 
 
