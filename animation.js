@@ -572,10 +572,12 @@ function prepareAnimation(el) {
       // Wooo XSS attack vectors!
       global.eval(xhr.responseText);
       data = global.animationData[src];
-      if (!data) {
+      if (data) {
+        processData(data);
+      } else {
+        // TODO(benvanik): show error image?
         log('<animation src="' + src + '"> data not found after fetch');
       }
-      processData(data);
     };
     xhr.open('GET', dataSrc, true);
     xhr.send(null);
