@@ -18,6 +18,14 @@ Y = 0
 W = 863
 H = 580
 
+# X = 600
+# Y = 500
+# R = 1100
+# B = 600
+# W = R - X
+# H = B - Y
+
+
 w = gtk.gdk.get_default_root_window()
 sz = w.get_size()
 sz = (W, H)
@@ -70,7 +78,7 @@ def toggle_auto_advance(state):
     state.running = False
     return
   else:
-    print 'Starting auto capture, ctrl-alt-m to stop...'
+    print 'Starting auto capture, ctrl-alt-w to stop...'
     state.running = True
     countdown(wait_time)
     advance_loop(state)
@@ -90,7 +98,7 @@ def advance(state):
   pointer = w.get_pointer()
 
   f = open(base_name + '/screenshot_' + filename + '.txt', 'w')
-  f.write('%s,%s' % (pointer[0], pointer[1]))
+  f.write('%s,%s' % (pointer[0] - X, pointer[1] - Y))
   f.close()
 
   pb = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,False,8,sz[0],sz[1])
@@ -103,10 +111,10 @@ def advance(state):
 
 
 if mode == 'wait_key':
-  print 'Press ctrl-alt-n to capture, ctrl-alt-m to toggle 3sec loop...'
+  print 'Press ctrl-alt-q to capture, ctrl-alt-w to toggle 3sec loop...'
   import keybinder
-  keybinder.bind('<Ctrl><Mod1>n', advance, state)
-  keybinder.bind('<Ctrl><Mod1>m', toggle_auto_advance, state)
+  keybinder.bind('<Ctrl><Mod1>q', advance, state)
+  keybinder.bind('<Ctrl><Mod1>w', toggle_auto_advance, state)
   gtk.main()
 elif mode == 'wait_time':
   while True:
