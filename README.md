@@ -16,7 +16,7 @@ Original details are at http://www.sublimetext.com/~jps/animated_gifs_the_hard_w
 
 ## Getting Started (Compiling the Example)
 ```
-sudo apt-get install pngcrush python-opencv python-numpy python-scipy
+sudo apt-get install pngcrush python-opencv python-numpy python-scipy python-keybinder
 python anim_encoder.py example
 firefox example.html
 ```
